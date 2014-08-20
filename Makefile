@@ -11,28 +11,28 @@ UNITS:=$(filter $(SRCS_STRIPPED), $(DEPS_STRIPPED))
 PROGS:=$(UNITS:%=bin/%)
 MODULES:=$(UNITS:%=modules/stap_%.ko)
 
-all: progs modules
+all: progs mods
 
 run: $(UNITS:%=run_%)
 
-run_%: modules/stap_%.ko | results_dir
+run_%: modules/stap_%.ko | results
 	staprun $^ -o results/$* SY_syscaller=$* -D
 	sleep 5
 	bin/$*
-results_dir:
+results:
 	-mkdir results
 
 progs: $(PROGS)
 
-bin/%: samples/**/%.c | binary_dir
+bin/%: samples/**/%.c | bin
 	$(CC) $(CFLAGS) -o $@ $^
-binary_dir:
+bin:
 	-mkdir bin
 
-modules: $(MODULES)
+mods: $(MODULES)
 
-$(MODULES): modules/stap_%.ko: dependencies/% $(wildcard samples/**/%.c) syscaller.stp | modules_dir
+$(MODULES): modules/stap_%.ko: dependencies/% $(wildcard samples/**/%.c) syscaller.stp | modules
 	stap -p4 -v -m stap_$* syscaller.stp $* '"*@$(shell cat $<)"'
 	mv stap_$*.ko modules/
-modules_dir:
+modules:
 	-mkdir modules
