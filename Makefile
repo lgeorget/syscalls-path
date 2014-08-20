@@ -15,18 +15,24 @@ all: progs modules
 
 run: $(UNITS:%=run_%)
 
-run_%: modules/stap_%.ko
+run_%: modules/stap_%.ko | results_dir
 	staprun $^ -o results/$* SY_syscaller=$* -D
 	sleep 5
 	bin/$*
+results_dir:
+	-mkdir results_dir
 
 progs: $(PROGS)
 
-bin/%: samples/**/%.c
+bin/%: samples/**/%.c | binary_dir
 	$(CC) $(CFLAGS) -o $@ $^
+binary_dir:
+	-mkdir results_dir
 
 modules: $(MODULES)
 
-$(MODULES): modules/stap_%.ko: dependencies/% $(wildcard samples/**/%.c) syscaller.stp
+$(MODULES): modules/stap_%.ko: dependencies/% $(wildcard samples/**/%.c) syscaller.stp | modules_dir
 	stap -p4 -v -m stap_$* syscaller.stp $* '"*@$(shell cat $<)"'
 	mv stap_$*.ko modules/
+modules_dir:
+	-mkdir modules_dir
