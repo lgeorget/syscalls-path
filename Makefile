@@ -20,14 +20,14 @@ run_%: modules/stap_%.ko | results_dir
 	sleep 5
 	bin/$*
 results_dir:
-	-mkdir results_dir
+	-mkdir results
 
 progs: $(PROGS)
 
 bin/%: samples/**/%.c | binary_dir
 	$(CC) $(CFLAGS) -o $@ $^
 binary_dir:
-	-mkdir results_dir
+	-mkdir bin
 
 modules: $(MODULES)
 
@@ -35,4 +35,4 @@ $(MODULES): modules/stap_%.ko: dependencies/% $(wildcard samples/**/%.c) syscall
 	stap -p4 -v -m stap_$* syscaller.stp $* '"*@$(shell cat $<)"'
 	mv stap_$*.ko modules/
 modules_dir:
-	-mkdir modules_dir
+	-mkdir modules
