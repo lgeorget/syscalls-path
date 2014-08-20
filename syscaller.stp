@@ -16,14 +16,14 @@ probe syscall.$1.return
 	}
 }
 
-probe kernel.function($2).call, kernel.function("*@security/**/*.c").call
+probe kernel.function(@2).call, kernel.function("*@security/**/*.c").call
 {
 	if (SY_syscaller_pid == pid()) {
 		printf("%s -> %s [%s]\n", thread_indent(2), ppfunc(), $$vars)
 	}
 }
 
-probe kernel.function($2).call, kernel.function("*@security/**/*.c").return
+probe kernel.function(@2).call, kernel.function("*@security/**/*.c").return
 {
 	if (SY_syscaller_pid == pid()) {
 		printf("%s <- %s [%s]\n", thread_indent(-2), ppfunc(), $$vars)

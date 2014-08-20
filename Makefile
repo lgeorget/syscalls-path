@@ -32,7 +32,7 @@ bin:
 mods: $(MODULES)
 
 $(MODULES): modules/stap_%.ko: dependencies/% $(wildcard samples/**/%.c) syscaller.stp | modules
-	stap -p4 -v -m stap_$* syscaller.stp $* '"*@$(shell cat $<)"'
+	stap -p4 -v -m stap_$* syscaller.stp $* "*@$(shell cat $<)"
 	mv stap_$*.ko modules/
 modules:
 	-mkdir modules
