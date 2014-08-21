@@ -1,16 +1,16 @@
-global SY_syscaller_pid = -1, SY_syscaller = ""
+global SY_syscaller_init = 0
 
 probe syscall.$1
 {
-	if (SY_syscaller_pid == -1 && SY_syscaller == execname()) {
-		SY_syscaller_pid = pid()
+	if (pid() == target()) {
+		SY_syscaller_init = 1
 		printf("%s -> %s [%s]\n", thread_indent(0), ppfunc(), $$vars)
 	}
 }
 
 probe syscall.$1.return
 {
-	if (SY_syscaller_pid ==  pid()) {
+	if (pid() ==  target() && SY_syscaller_init == 1) {
 		printf("%s <- %s [%s]\n", thread_indent(0), ppfunc(), $$vars)
 		exit()
 	}
@@ -18,14 +18,14 @@ probe syscall.$1.return
 
 probe kernel.function(@2).call, kernel.function("*@security/**/*.c").call
 {
-	if (SY_syscaller_pid == pid()) {
+	if (pid() == target() && SY_syscaller_init == 1) {
 		printf("%s -> %s [%s]\n", thread_indent(2), ppfunc(), $$vars)
 	}
 }
 
 probe kernel.function(@2).call, kernel.function("*@security/**/*.c").return
 {
-	if (SY_syscaller_pid == pid()) {
+	if (pid() == target() && SY_syscaller_init == 1) {
 		printf("%s <- %s [%s]\n", thread_indent(-2), ppfunc(), $$vars)
 	}
 }
