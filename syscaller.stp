@@ -1,6 +1,6 @@
 global SY_syscaller_init = 0
 
-probe syscall.$1
+probe syscall.$1 !, kernel.function("sys_"@1).call
 {
 	if (pid() == target()) {
 		SY_syscaller_init = 1
@@ -8,7 +8,7 @@ probe syscall.$1
 	}
 }
 
-probe syscall.$1.return
+probe syscall.$1.return !, kernel.function("sys_"@1).return
 {
 	if (pid() ==  target() && SY_syscaller_init == 1) {
 		printf("%s <- %s [%s]\n", thread_indent(0), ppfunc(), $$vars)
