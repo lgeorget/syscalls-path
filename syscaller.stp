@@ -4,14 +4,14 @@ probe syscall.$1 !, kernel.function("sys_"@1).call
 {
 	if (pid() == target()) {
 		SY_syscaller_init = 1
-		printf("%s -> %s [%s]\n", thread_indent(0), ppfunc(), $$vars)
+		printf("%s -> %s\n", thread_indent(0), ppfunc())
 	}
 }
 
 probe syscall.$1.return !, kernel.function("sys_"@1).return
 {
 	if (pid() ==  target() && SY_syscaller_init == 1) {
-		printf("%s <- %s [%s]\n", thread_indent(0), ppfunc(), $$vars)
+		printf("%s <- %s\n", thread_indent(0), ppfunc())
 		exit()
 	}
 }
@@ -19,13 +19,13 @@ probe syscall.$1.return !, kernel.function("sys_"@1).return
 probe kernel.function(@2).call, kernel.function("*@security/**/*.c").call
 {
 	if (pid() == target() && SY_syscaller_init == 1) {
-		printf("%s -> %s [%s]\n", thread_indent(2), ppfunc(), $$vars)
+		printf("%s -> %s\n", thread_indent(2), ppfunc())
 	}
 }
 
-probe kernel.function(@2).call, kernel.function("*@security/**/*.c").return
+probe kernel.function(@2).return, kernel.function("*@security/**/*.c").return
 {
 	if (pid() == target() && SY_syscaller_init == 1) {
-		printf("%s <- %s [%s]\n", thread_indent(-2), ppfunc(), $$vars)
+		printf("%s <- %s\n", thread_indent(-2), ppfunc())
 	}
 }
