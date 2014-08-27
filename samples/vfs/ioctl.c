@@ -15,9 +15,9 @@ int main(void)
 {
 	printf("Éjection du CDROM...\n");
 
-	int fd = open("/dev/sr0", O_RDWR|O_NONBLOCK);
+	int fd = open("/dev/cdrom", O_RDWR|O_NONBLOCK);
 	if (fd < 0) {
-		perror("Impossible d'ouvrir le fichier /dev/sr0");
+		perror("Impossible d'ouvrir le fichier /dev/cdrom");
 		exit(1);
 	}
 
